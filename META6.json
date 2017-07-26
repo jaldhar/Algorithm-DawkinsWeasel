@@ -4,8 +4,11 @@
   ],
   "build-depends" : [ ],
   "depends" : [ ],
-  "description" : "blah blah blah",
-  "license" : "Artistic-2.0",
+  "description" : "An Illustration of Cumulative Selection",
+  "license" : [
+    "Artistic-2.0",
+    "GPL-2.0+"
+  ],
   "name" : "Algorithm::DawkinsWeasel",
   "perl" : "6.c",
   "provides" : {

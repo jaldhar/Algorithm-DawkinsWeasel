@@ -1,24 +1,26 @@
 use v6.c;
-unit class Algorithm::DawkinsWeasel:ver<0.0.1>;
 
 =begin pod
 
 =head1 NAME
 
-Algorithm::DawkinsWeasel - an illustration of cumulative selection
+Algorithm::DawkinsWeasel - An Illustration of Cumulative Selection
 
 =head1 SYNOPSIS
 
   use Algorithm::DawkinsWeasel;
 
-  my $weasel = Algorithm::DawkinsWeasel.new('METHINKS IT IS LIKE A WEASEL',
-    0.05, 100);
+  my $weasel = Algorithm::DawkinsWeasel.new(
+    target-phrase      => 'METHINKS IT IS LIKE A WEASEL',
+    mutation-threshold => 0.05,
+    copies             => 100,
+  );
     
   repeat {
-    say $weasel.count().fmt('%04d'), ' ', $weasel.current-phrase(),
-      " [$weasel.hi-score]";
-
-  } while !$weasel.evolve();
+    given $weasel {
+      say .count.fmt('%04d'), ' ', .current-phrase, ' [', .hi-score, ']';
+    }
+  } until $weasel.evolve;
 
 
 
@@ -41,7 +43,9 @@ The original form of it looked like this:
 This module parametrizes the target string, mutation threshold, and number of
 copies per round.
 
-=cut
+=end pod
+
+unit class Algorithm::DawkinsWeasel:ver<0.0.1>;
 
 has Str @!charset;
 has Str @.target-phrase;
@@ -52,46 +56,56 @@ has Int $.hi-score;
 has Int $.count;
 
 
-method BUILD(Str $target-phrase = 'METHINKS IT IS LIKE A WEASEL',
-Rat $mutation-threshold = 0.05, Int $copies = 100) {
-    @.charset  = | ['A' .. 'Z'] , ' ';
-    @.target-phrase = $target-phrase.comb;
-    $.mutation-threshold = $mutation-threshold;
-    $.copies = $copies;
+submethod BUILD(Str :$target-phrase = 'METHINKS IT IS LIKE A WEASEL',
+Rat :$mutation-threshold = 0.05, Int :$copies = 100) {
+    @!charset  = | ['A' .. 'Z'] , ' ';
+    @!target-phrase = $target-phrase.comb;
+    $!mutation-threshold = $mutation-threshold;
+    $!copies = $copies;
 
-    @.current-phrase = map { @charset.pick }, 0 .. @.target-phrase.end;
-    $.hi-score = 0;
-    $.count = 0;
+    @!current-phrase = map { @!charset.pick }, 0 .. @!target-phrase.end;
+    $!hi-score = 0;
+    $!count = 0;
 }
 
 
 method evolve() {
-    $.count++;
+    $!count++;
 
-    for (1 .. $.copies) {
+    for (1 .. $!copies) {
         my @trial = map {
-            1.rand < $.mutation-threshold ?? @.charset.pick !! $_;
-        }, @.current-phrase;
+            1.rand < $!mutation-threshold ?? @!charset.pick !! $_;
+        }, @!current-phrase;
         
         my Int $score = 0;
-        for 0 .. @.target-phrase.end -> $i {
-            if @trial[$i] eq @.target-phrase[$i] {
+        for 0 .. @!target-phrase.end -> $i {
+            if @trial[$i] eq @!target-phrase[$i] {
                 $score++;
             }
         }
-        if $score > $.hi-score {
-            $.hi-score = $score;
-            @.current-phrase = @trial;
+
+        if $score > $!hi-score {
+            $!hi-score = $score;
+            @!current-phrase = @trial;
         }
     }
 
-    return $.hi-score == @.target-phrase.elems;
+    return ($!hi-score == @!target-phrase.elems);
 }
 
+method current-phrase() {
+    return @!current-phrase.join('');
+}
+
+method target-phrase() {
+    return @!target-phrase.join('');
+}
+
+=begin pod
 
 =head1 SEE ALSO
 
-L<https://en.wikipedia.org/wiki/Weasel_program|Weasel Program at Wikipedia>
+L<Weasel Program at Wikipedia|https://en.wikipedia.org/wiki/Weasel_program>
 
 =head1 AUTHOR
 
@@ -99,8 +113,17 @@ Jaldhar H. Vyas <jaldhar@braincells.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017 Jaldhar H. Vyas
+Copyright (C) 2017, Consolidated Braincells Inc.  All rights reserved.
 
-This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+This distribution is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version, or
+
+b) the Artistic License version 2.0.
+
+The full text of the license can be found in the LICENSE file included
+with this distribution.
 
 =end pod
