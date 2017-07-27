@@ -47,15 +47,16 @@ copies per round.
 
 =end pod
 
-unit class Algorithm::DawkinsWeasel:ver<0.0.1>;
+unit class Algorithm::DawkinsWeasel:ver<0.0.2>;
 
-has Str @!charset;
 has Str @.target-phrase;
 has Rat $.mutation-threshold;
 has Int $.copies;
-has Str @.current-phrase;
-has Int $.hi-score;
-has Int $.count;
+
+has Str @!charset;
+has Int $!count;
+has Str @!current-phrase;
+has Int $!hi-score;
 
 =begin pod
 
@@ -83,11 +84,13 @@ has Int $.count;
 
 submethod BUILD(Str :$target-phrase = 'METHINKS IT IS LIKE A WEASEL',
 Rat :$mutation-threshold = 0.05, Int :$copies = 100) {
-    @!charset  = | ['A' .. 'Z'] , ' ';
     @!target-phrase = $target-phrase.comb;
     $!mutation-threshold = $mutation-threshold;
     $!copies = $copies;
+}
 
+submethod TWEAK {
+    @!charset  = | ['A' .. 'Z'] , ' ';
     @!current-phrase = map { @!charset.pick }, 0 .. @!target-phrase.end;
     $!hi-score = 0;
     $!count = 0;
@@ -115,7 +118,7 @@ method evolve() {
         }
     }
 
-    return ($!hi-score == @!target-phrase.elems);
+    return $!hi-score == @!target-phrase.elems;
 }
 
 =begin pod
@@ -129,6 +132,14 @@ method evolve() {
 
   Returns the number of rounds of the algorithm which have taken place.
 
+=end pod
+
+method count {
+    return $!count;
+}
+
+=begin pod
+
 =head2 Str current-phrase()
 
   Returns the current state of the phrase including any mutations that have
@@ -136,7 +147,7 @@ method evolve() {
 
 =end pod
 
-method current-phrase() {
+method current-phrase {
     return @!current-phrase.join('');
 }
 
@@ -150,7 +161,15 @@ method current-phrase() {
   the highest score.  When the high score equals the length of the target
   phrase, you will know the algorithm has ended successfully.
 
-=head2 Rat mutation-threshold() {
+=end pod
+
+method hi-score {
+    return $!hi-score;
+}
+
+=begin pod
+
+=head2 Rat mutation-threshold()
 
   Returns the percentage chance of a letter mutating per round as set in the
   constructor.
@@ -162,7 +181,7 @@ method current-phrase() {
 
 =end pod
 
-method target-phrase() {
+method target-phrase {
     return @!target-phrase.join('');
 }
 
