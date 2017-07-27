@@ -43,6 +43,8 @@ The original form of it looked like this:
 This module parametrizes the target string, mutation threshold, and number of
 copies per round.
 
+=head1 METHODS
+
 =end pod
 
 unit class Algorithm::DawkinsWeasel:ver<0.0.1>;
@@ -55,6 +57,29 @@ has Str @.current-phrase;
 has Int $.hi-score;
 has Int $.count;
 
+=begin pod
+
+=head2 new(target-phrase => Str, mutation-threshold => Rat, copies => Int)
+
+  Creates a new Algorithm::DawkinsWeasel object.
+
+=item target-phrase
+
+  A string of characters in the set A-Z plus spaces.  This defaults to
+  "METHINKS IT IS LIKE A WEASEL"
+
+=item mutation-threshold
+
+  The percentage chance per round that a character in the phrase will "mutate",
+  i.e will change to another random character, expressed as a rational number
+  between 0 and 1.  This defaults to 0.05 (5%).
+
+=item copies
+
+  The amount of copies of the phrase which will be made in each round.  This
+  defaults to 100.
+
+=end pod
 
 submethod BUILD(Str :$target-phrase = 'METHINKS IT IS LIKE A WEASEL',
 Rat :$mutation-threshold = 0.05, Int :$copies = 100) {
@@ -93,9 +118,49 @@ method evolve() {
     return ($!hi-score == @!target-phrase.elems);
 }
 
+=begin pod
+
+=head2 Int copies()
+
+  Returns the number of copies of the phrase made in each round as set in the
+  constructor.
+
+=head2 Int count()
+
+  Returns the number of rounds of the algorithm which have taken place.
+
+=head2 Str current-phrase()
+
+  Returns the current state of the phrase including any mutations that have
+  taken place.
+
+=end pod
+
 method current-phrase() {
     return @!current-phrase.join('');
 }
+
+=begin pod
+
+=head2 Int hi-score()
+
+  During each round of the algorithm, each copy of the current phrase will be
+  given a score of +1 for every letter which is the same as the similarly
+  placed letter in the target phrase.  This method will return the value of
+  the highest score.  When the high score equals the length of the target
+  phrase, you will know the algorithm has ended successfully.
+
+=head2 Rat mutation-threshold() {
+
+  Returns the percentage chance of a letter mutating per round as set in the
+  constructor.
+
+=head2 Str target-phrase()
+
+  Returns the phrase the algorithm is trying to evolve towards as set in the
+  constructor.
+
+=end pod
 
 method target-phrase() {
     return @!target-phrase.join('');

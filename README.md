@@ -6,6 +6,7 @@ Algorithm::DawkinsWeasel - An Illustration of Cumulative Selection
 SYNOPSIS
 ========
 
+```
   use Algorithm::DawkinsWeasel;
 
   my $weasel = Algorithm::DawkinsWeasel.new(
@@ -19,6 +20,7 @@ SYNOPSIS
       say .count.fmt('%04d'), ' ', .current-phrase, ' [', .hi-score, ']';
     }
   }
+```
 
 DESCRIPTION
 ===========

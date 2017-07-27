@@ -15,7 +15,7 @@
     "Algorithm::DawkinsWeasel" : "lib/Algorithm/DawkinsWeasel.pm6"
   },
   "resources" : [ ],
-  "source-url" : "",
+  "source-url" : "https://github.com/jaldhar/Algorithm-DawkinsWeasel",
   "tags" : [ ],
   "test-depends" : [ ],
   "version" : "0.0.1"
