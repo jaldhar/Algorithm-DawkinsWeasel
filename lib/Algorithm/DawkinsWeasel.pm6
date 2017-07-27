@@ -16,13 +16,9 @@ Algorithm::DawkinsWeasel - An Illustration of Cumulative Selection
     copies             => 100,
   );
     
-  repeat {
-    given $weasel {
-      say .count.fmt('%04d'), ' ', .current-phrase, ' [', .hi-score, ']';
-    }
-  } until $weasel.evolve;
-
-
+  for $weasel.evolution {
+    say .count.fmt('%04d '), .current-phrase, ' [', .hi-score, ']';
+  }
 
 =head1 DESCRIPTION
 
@@ -47,7 +43,7 @@ copies per round.
 
 =end pod
 
-unit class Algorithm::DawkinsWeasel:ver<0.0.2>;
+unit class Algorithm::DawkinsWeasel:ver<0.1.0>;
 
 has Str @.target-phrase;
 has Rat $.mutation-threshold;
@@ -96,8 +92,7 @@ submethod TWEAK {
     $!count = 0;
 }
 
-
-method evolve() {
+method !evolve {
     $!count++;
 
     for (1 .. $!copies) {
@@ -119,6 +114,25 @@ method evolve() {
     }
 
     return $!hi-score == @!target-phrase.elems;
+}
+
+=begin pod
+
+=head2 Seq evolution()
+
+  This is the main method in this class.  Each iteration of the returned
+  sequence represents one round of the algorithm until the target phrase is
+  reached.
+
+=end pod
+
+method evolution {
+    return gather {
+        repeat {
+            take self;
+        } until self!evolve;
+        take self;  # for the last round
+    };
 }
 
 =begin pod

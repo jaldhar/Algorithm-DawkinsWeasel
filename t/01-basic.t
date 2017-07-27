@@ -10,10 +10,9 @@ pass $weasel.target-phrase eq 'METHINKS IT IS LIKE A WEASEL';
 pass $weasel.mutation-threshold == 0.05;
 pass $weasel.copies == 100;
 
-repeat {
-    say $weasel.current-phrase;
-} until $weasel.evolve;
-say $weasel.current-phrase;
+for $weasel.evolution {
+    say .count.fmt('%04d '), .current-phrase, ' [', .hi-score, ']';
+}
 
 pass $weasel.current-phrase eq 'METHINKS IT IS LIKE A WEASEL';
 

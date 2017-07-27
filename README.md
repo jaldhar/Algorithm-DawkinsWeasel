@@ -15,10 +15,8 @@ SYNOPSIS
     copies             => 100,
   );
 
-  repeat {
-    given $weasel {
-      say .count.fmt('%04d'), ' ', .current-phrase, ' [', .hi-score, ']';
-    }
+  for $weasel.evolution {
+    say .count.fmt('%04d '), .current-phrase, ' [', .hi-score, ']';
   }
 ```
 
