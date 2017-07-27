@@ -1,5 +1,79 @@
 use v6.c;
 
+unit class Algorithm::DawkinsWeasel:ver<0.1.0>;
+
+has Str @.target-phrase;
+has Rat $.mutation-threshold;
+has Int $.copies;
+
+has Str @!charset;
+has Int $!count;
+has Str @!current-phrase;
+has Int $!hi-score;
+
+submethod BUILD(Str :$target-phrase = 'METHINKS IT IS LIKE A WEASEL',
+Rat :$mutation-threshold = 0.05, Int :$copies = 100) {
+    @!target-phrase = $target-phrase.comb;
+    $!mutation-threshold = $mutation-threshold;
+    $!copies = $copies;
+}
+
+submethod TWEAK {
+    @!charset  = | ['A' .. 'Z'] , ' ';
+    @!current-phrase = map { @!charset.pick }, 0 .. @!target-phrase.end;
+    $!hi-score = 0;
+    $!count = 0;
+}
+
+method !evolve {
+    $!count++;
+
+    for (1 .. $!copies) {
+        my @trial = map {
+            1.rand < $!mutation-threshold ?? @!charset.pick !! $_;
+        }, @!current-phrase;
+
+        my Int $score = 0;
+        for 0 .. @!target-phrase.end -> $i {
+            if @trial[$i] eq @!target-phrase[$i] {
+                $score++;
+            }
+        }
+
+        if $score > $!hi-score {
+            $!hi-score = $score;
+            @!current-phrase = @trial;
+        }
+    }
+
+    return $!hi-score == @!target-phrase.elems;
+}
+
+method evolution {
+    return gather {
+        repeat {
+            take self;
+        } until self!evolve;
+        take self;  # for the last round
+    };
+}
+
+method count {
+    return $!count;
+}
+
+method current-phrase {
+    return @!current-phrase.join('');
+}
+
+method hi-score {
+    return $!hi-score;
+}
+
+method target-phrase {
+    return @!target-phrase.join('');
+}
+
 =begin pod
 
 =head1 NAME
@@ -41,21 +115,6 @@ copies per round.
 
 =head1 METHODS
 
-=end pod
-
-unit class Algorithm::DawkinsWeasel:ver<0.1.0>;
-
-has Str @.target-phrase;
-has Rat $.mutation-threshold;
-has Int $.copies;
-
-has Str @!charset;
-has Int $!count;
-has Str @!current-phrase;
-has Int $!hi-score;
-
-=begin pod
-
 =head2 new(target-phrase => Str, mutation-threshold => Rat, copies => Int)
 
   Creates a new Algorithm::DawkinsWeasel object.
@@ -76,66 +135,11 @@ has Int $!hi-score;
   The amount of copies of the phrase which will be made in each round.  This
   defaults to 100.
 
-=end pod
-
-submethod BUILD(Str :$target-phrase = 'METHINKS IT IS LIKE A WEASEL',
-Rat :$mutation-threshold = 0.05, Int :$copies = 100) {
-    @!target-phrase = $target-phrase.comb;
-    $!mutation-threshold = $mutation-threshold;
-    $!copies = $copies;
-}
-
-submethod TWEAK {
-    @!charset  = | ['A' .. 'Z'] , ' ';
-    @!current-phrase = map { @!charset.pick }, 0 .. @!target-phrase.end;
-    $!hi-score = 0;
-    $!count = 0;
-}
-
-method !evolve {
-    $!count++;
-
-    for (1 .. $!copies) {
-        my @trial = map {
-            1.rand < $!mutation-threshold ?? @!charset.pick !! $_;
-        }, @!current-phrase;
-        
-        my Int $score = 0;
-        for 0 .. @!target-phrase.end -> $i {
-            if @trial[$i] eq @!target-phrase[$i] {
-                $score++;
-            }
-        }
-
-        if $score > $!hi-score {
-            $!hi-score = $score;
-            @!current-phrase = @trial;
-        }
-    }
-
-    return $!hi-score == @!target-phrase.elems;
-}
-
-=begin pod
-
 =head2 Seq evolution()
 
   This is the main method in this class.  Each iteration of the returned
   sequence represents one round of the algorithm until the target phrase is
   reached.
-
-=end pod
-
-method evolution {
-    return gather {
-        repeat {
-            take self;
-        } until self!evolve;
-        take self;  # for the last round
-    };
-}
-
-=begin pod
 
 =head2 Int copies()
 
@@ -146,26 +150,10 @@ method evolution {
 
   Returns the number of rounds of the algorithm which have taken place.
 
-=end pod
-
-method count {
-    return $!count;
-}
-
-=begin pod
-
 =head2 Str current-phrase()
 
   Returns the current state of the phrase including any mutations that have
   taken place.
-
-=end pod
-
-method current-phrase {
-    return @!current-phrase.join('');
-}
-
-=begin pod
 
 =head2 Int hi-score()
 
@@ -174,14 +162,6 @@ method current-phrase {
   placed letter in the target phrase.  This method will return the value of
   the highest score.  When the high score equals the length of the target
   phrase, you will know the algorithm has ended successfully.
-
-=end pod
-
-method hi-score {
-    return $!hi-score;
-}
-
-=begin pod
 
 =head2 Rat mutation-threshold()
 
@@ -192,14 +172,6 @@ method hi-score {
 
   Returns the phrase the algorithm is trying to evolve towards as set in the
   constructor.
-
-=end pod
-
-method target-phrase {
-    return @!target-phrase.join('');
-}
-
-=begin pod
 
 =head1 SEE ALSO
 
