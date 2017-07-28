@@ -1,6 +1,6 @@
 use v6.c;
 
-unit class Algorithm::DawkinsWeasel:ver<0.1.0>;
+unit class Algorithm::DawkinsWeasel:ver<0.1.1>;
 
 has Str @.target-phrase;
 has Rat $.mutation-threshold;
