@@ -4,16 +4,16 @@ use Algorithm::DawkinsWeasel;
 
 my $weasel = Algorithm::DawkinsWeasel.new;
 
-pass $weasel.isa: 'Algorithm::DawkinsWeasel';
+ok $weasel.isa('Algorithm::DawkinsWeasel'), 'is a Algorithm::DawkinsWeasel';
 
-pass $weasel.target-phrase eq 'METHINKS IT IS LIKE A WEASEL';
-pass $weasel.mutation-threshold == 0.05;
-pass $weasel.copies == 100;
+is $weasel.target-phrase, 'METHINKS IT IS LIKE A WEASEL', 'target-phrase';
+is $weasel.mutation-threshold, 0.05, 'mutation-threshold';
+is $weasel.copies, 100, 'copies';
 
 for $weasel.evolution {
-    say .count.fmt('%04d '), .current-phrase, ' [', .hi-score, ']';
+    diag join '', (.count.fmt('%04d '), .current-phrase, ' [', .hi-score, ']');
 }
 
-pass $weasel.current-phrase eq 'METHINKS IT IS LIKE A WEASEL';
+is $weasel.current-phrase, 'METHINKS IT IS LIKE A WEASEL', 'target reached';
 
 done-testing;
