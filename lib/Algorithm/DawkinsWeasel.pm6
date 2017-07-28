@@ -20,7 +20,7 @@ Rat :$mutation-threshold = 0.05, Int :$copies = 100) {
 
 submethod TWEAK {
     @!charset  = | ['A' .. 'Z'] , ' ';
-    @!current-phrase = map { @!charset.pick }, 0 .. @!target-phrase.end;
+    @!current-phrase = @!charset.roll: @!target-phrase.elems;
     $!hi-score = 0;
     $!count = 0;
 }
@@ -29,16 +29,11 @@ method !evolve {
     $!count++;
 
     for (1 .. $!copies) {
-        my @trial = map {
-            1.rand < $!mutation-threshold ?? @!charset.pick !! $_;
-        }, @!current-phrase;
+        my @trial = @!current-phrase.map: {
+            rand < $!mutation-threshold ?? @!charset.roll !! $_;
+        };
 
-        my Int $score = 0;
-        for 0 .. @!target-phrase.end -> $i {
-            if @trial[$i] eq @!target-phrase[$i] {
-                $score++;
-            }
-        }
+        my Int $score = [+] @!target-phrase Zeq @trial;
 
         if $score > $!hi-score {
             $!hi-score = $score;
